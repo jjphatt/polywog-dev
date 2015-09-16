@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------
+Building polywog requires CMake 2.8.5, found at http://www.cmake.org/, as
+well as GNU make. It also requires you to have polymec 
+(http://bitbucket.org/jjphatt/polymec) built and installed somewhere. To 
+build polywog on a UNIX-like system, use the following commands:
+
+     $ make config polymec=/path/to/polymec
+     $ make
+
+Installation
+------------
+To install polywog, run
+
+    $ make install
+
+The default installation prefix is /usr/local. To pick an installation 
+prefix for polywog pass prefix=[path] to make config. For example,
+
+    $ make config prefix=~/myroot/
+
+will cause polywog to be installed in ~/myroot/ when make install is run.
+
+Other make commands
+-------------------
+   $ make uninstall 
+          Removes all files installed by 'make install'.
+   
+   $ make clean 
+          Removes all object files but retains the configuration options.
+   
+   $ make distclean 
+          Performs clean and completely removes the build directory.
+
+------------------------------------------------------------------------------
