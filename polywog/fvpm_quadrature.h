@@ -11,6 +11,7 @@
 #include "core/point_cloud.h"
 #include "integrators/volume_integral.h"
 #include "integrators/surface_integral.h"
+#include "model/neighbor_pairing.h"
 
 // This file contains several quadrature rules for evaluating volume and 
 // surface integrals using the Finite Volume Point Method, which involves 
@@ -21,6 +22,10 @@
 // neighbor pairing, and the "ith" integral refers to the integral of the 
 // region of intersection over the ith pair of points in the point cloud, 
 // using the indexing scheme defined by the neighbor pairing.
+
+// Each of these quadrature rules has the same policy for memory management:
+// it does not assert ownership over any of the objects it has been handed 
+// for construction.
 
 // This quadrature rule computes surface integrals over the intersections of 
 // pairs of cubes whose extents are defined by the ratio of its side to the 

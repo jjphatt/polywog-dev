@@ -6,7 +6,8 @@ add_custom_target(update_polywog_c ALL
 add_library(polywog polywog.c 
             partition_point_cloud_with_neighbors.c
             shape_function.c shepard_shape_function.c mls_shape_function.c
-            gmls_functional.c gmls_matrix.c mlpg_quadrature.c
+            gmls_functional.c gmls_matrix.c mlpg_quadrature.c fvpm_quadrature.c
+            fvpm_interparticle_area.c
             interpreter_register_meshless_functions.c)
 add_dependencies(polywog update_polywog_c)
 
