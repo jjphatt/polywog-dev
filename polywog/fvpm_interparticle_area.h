@@ -9,8 +9,8 @@
 #define POLYWOG_FVPM_INTERPARTICLE_AREA_H
 
 #include "core/point_cloud.h"
-#include "core/point_spacing_estimator.h"
 #include "model/neighbor_pairing.h"
+#include "model/point_spacing_estimator.h"
 
 // This class computes interparticle areas (denoted as beta_ij in the FVPM
 // literature, e.g. Quinlan et al / CPC 185 (2014) 1554. It exactly integrates
