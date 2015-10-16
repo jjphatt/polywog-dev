@@ -9,6 +9,7 @@
 #define POLYWOG_H
 
 #include "core/polymec.h"
+#include "polywog/polywog_version.h"
 
 #endif
 

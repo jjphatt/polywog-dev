@@ -23,14 +23,13 @@ if (NOT DEFINED POLYMEC_VERSION)
 endif()
 message("-- Found polymec library in ${POLYMEC_PREFIX} (v${POLYMEC_VERSION})")
 
-# Pass POLYWOG_VERSION and friends as definitions to the compiler.
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPOLYWOG_VERSION=\\\"${POLYWOG_VERSION}\\\"")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPOLYWOG_MAJOR_VERSION=${POLYWOG_MAJOR_VERSION}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPOLYWOG_MINOR_VERSION=${POLYWOG_MINOR_VERSION}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPOLYWOG_PATCH_VERSION=${POLYWOG_PATCH_VERSION}")
+# Generate polywog_version.h with the right version numbers.
+add_custom_target(update_version_h ALL
+                  python ${POLYMEC_PREFIX}/share/polymec/update_version_h.py polywog ${POLYWOG_VERSION} ${PROJECT_BINARY_DIR}/polywog/polywog_version.h)
 
 # Look for headers in the top directory.
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 # Look for libraries in these directories.
 link_directories("${POLYMEC_PREFIX}/lib")
