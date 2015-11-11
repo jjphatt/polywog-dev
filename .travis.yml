@@ -25,7 +25,6 @@ addons:
       - libopenmpi-dev
       - gfortran
       - wget
-      - rvm
 
   deploy:
     provider: s3
