@@ -25,7 +25,7 @@ message("-- Found polymec library in ${POLYMEC_PREFIX} (v${POLYMEC_VERSION})")
 
 # Generate polywog_version.h with the right version numbers.
 add_custom_target(update_version_h ALL
-                  python ${POLYMEC_PREFIX}/share/polymec/update_version_h.py polywog ${POLYWOG_VERSION} ${PROJECT_BINARY_DIR}/polywog/polywog_version.h)
+                  python "${POLYMEC_PREFIX}/share/polymec/update_version_h.py" polywog ${POLYWOG_VERSION} ${PROJECT_BINARY_DIR}/polywog/polywog_version.h)
 
 # Look for headers in the top directory.
 include_directories(${PROJECT_SOURCE_DIR})
