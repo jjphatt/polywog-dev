@@ -16,5 +16,5 @@ install(TARGETS polywog DESTINATION lib)
 
 # Install headers, including generated files.
 file(GLOB HEADERS *.h)
-install(FILES ${HEADERS} DESTINATION include/polywog)
+install(FILES ${HEADERS} DESTINATION include/polymec/polywog)
 
