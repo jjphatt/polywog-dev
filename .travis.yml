@@ -40,7 +40,7 @@ addons:
 after_success: 
   - cd $HOME
   - mkdir -p latest 
-  - tar czvf polywog-$CC-debug=$DEBUG-mpi=$MPI.tar.gz polywog-$CC-debug=$DEBUG-mpi=$MPI/* 
+  - tar czvf polywog-$CC-debug=$DEBUG-mpi=$MPI.tar.gz polymec-$CC-debug=$DEBUG-mpi=$MPI/* 
   - mv polywog-$CC-debug=$DEBUG-mpi=$MPI.tar.gz latest
 
 script: 
