@@ -14,11 +14,6 @@ env:
   - DEBUG=1 MPI=0
   - DEBUG=1 MPI=1
 
-install:
-  # Here we install polymec itself, using one of our deployed builds.
-  - wget https://s3-us-west-2.amazonaws.com/polymec-dev.travis-ci/polymec-dev/polymec-$CC-debug%3D$DEBUG-mpi%3D$MPI.tar.gz
-  - tar xzvf polymec-$CC-debug=$DEBUG-mpi=$MPI.tar.gz
-
 addons:
   apt:
     # Travis whitelist of packages.
@@ -49,5 +44,7 @@ after_success:
   - mv polywog-$CC-debug=$DEBUG-mpi=$MPI.tar.gz latest
 
 script: 
+  - wget https://s3-us-west-2.amazonaws.com/polymec-dev.travis-ci/polymec-dev/polymec-$CC-debug%3D$DEBUG-mpi%3D$MPI.tar.gz
+  - tar xzvf polymec-$CC-debug=$DEBUG-mpi=$MPI.tar.gz
   - make config polymec=$HOME/polymec-$CC-debug=$DEBUG-mpi=$MPI && make -j4 install
 
