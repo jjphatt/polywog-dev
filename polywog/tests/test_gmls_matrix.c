@@ -90,11 +90,11 @@ void test_gmls_matrix_with_frankes_function(void** state)
     char* res_str = options_value(opts, "resolution");
     if (res_str != NULL)
     {
-      if (strcasecmp(res_str, "low") == 0)
+      if (string_casecmp(res_str, "low") == 0)
         nx = ny = 10;
-      else if (strcasecmp(res_str, "medium") == 0)
+      else if (string_casecmp(res_str, "medium") == 0)
         nx = ny = 20;
-      else if (strcasecmp(res_str, "high") == 0)
+      else if (string_casecmp(res_str, "high") == 0)
         nx = ny = 40;
     }
     char* neumann_str = options_value(opts, "neumann");
@@ -360,17 +360,17 @@ void test_gmls_matrix_with_cantileaver_beam(void** state)
     char* res_str = options_value(opts, "resolution");
     if (res_str != NULL)
     {
-      if (strcasecmp(res_str, "low") == 0)
+      if (string_casecmp(res_str, "low") == 0)
       {
         nx = 16;
         ny = nz = 3;
       }
-      else if (strcasecmp(res_str, "medium") == 0)
+      else if (string_casecmp(res_str, "medium") == 0)
       {
         nx = 33;
         ny = nz = 5;
       }
-      else if (strcasecmp(res_str, "high") == 0)
+      else if (string_casecmp(res_str, "high") == 0)
       {
         nx = 66;
         ny = nz = 10;
