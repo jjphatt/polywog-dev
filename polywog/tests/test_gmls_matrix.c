@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <string.h>
-#include "cmockery.h"
+#include "cmocka.h"
 #include "core/options.h"
 #include "core/dense_local_matrix.h"
 #include "core/linear_algebra.h"
@@ -532,11 +532,11 @@ void test_gmls_matrix_with_cantileaver_beam(void** state)
 int main(int argc, char* argv[]) 
 {
   polymec_init(argc, argv);
-  const UnitTest tests[] = 
+  const struct CMUnitTest tests[] = 
   {
-    unit_test(test_gmls_matrix_ctor),
-    unit_test(test_gmls_matrix_with_frankes_function),
-    unit_test(test_gmls_matrix_with_cantileaver_beam)
+    cmocka_unit_test(test_gmls_matrix_ctor),
+    cmocka_unit_test(test_gmls_matrix_with_frankes_function),
+    cmocka_unit_test(test_gmls_matrix_with_cantileaver_beam)
   };
-  return run_tests(tests);
+  return cmocka_run_group_tests(tests, NULL, NULL);
 }

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <string.h>
-#include "cmockery.h"
+#include "cmocka.h"
 #include "make_mlpg_lattice.h"
 #include "poisson_gmls_functional.h"
 
@@ -47,11 +47,11 @@ void test_gmls_functional_ctor_4(void** state)
 int main(int argc, char* argv[]) 
 {
   polymec_init(argc, argv);
-  const UnitTest tests[] = 
+  const struct CMUnitTest tests[] = 
   {
-    unit_test(test_gmls_functional_ctor_2),
-    unit_test(test_gmls_functional_ctor_3),
-    unit_test(test_gmls_functional_ctor_4)
+    cmocka_unit_test(test_gmls_functional_ctor_2),
+    cmocka_unit_test(test_gmls_functional_ctor_3),
+    cmocka_unit_test(test_gmls_functional_ctor_4)
   };
-  return run_tests(tests);
+  return cmocka_run_group_tests(tests, NULL, NULL);
 }

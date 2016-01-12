@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <string.h>
-#include "cmockery.h"
+#include "cmocka.h"
 #include "core/partition_point_cloud.h"
 #include "geometry/create_point_lattice.h"
 #include "polywog/mls_shape_function.h"
@@ -191,18 +191,18 @@ void test_mls_shape_function_zero_consistency_4(void** state)
 int main(int argc, char* argv[]) 
 {
   polymec_init(argc, argv);
-  const UnitTest tests[] = 
+  const struct CMUnitTest tests[] = 
   {
-    unit_test(test_mls_shape_function_ctor_0),
-    unit_test(test_mls_shape_function_ctor_1),
-    unit_test(test_mls_shape_function_ctor_2),
-    unit_test(test_mls_shape_function_ctor_3),
-    unit_test(test_mls_shape_function_ctor_4),
-    unit_test(test_mls_shape_function_zero_consistency_0),
-    unit_test(test_mls_shape_function_zero_consistency_1),
-    unit_test(test_mls_shape_function_zero_consistency_2),
-    unit_test(test_mls_shape_function_zero_consistency_3),
-    unit_test(test_mls_shape_function_zero_consistency_4)
+    cmocka_unit_test(test_mls_shape_function_ctor_0),
+    cmocka_unit_test(test_mls_shape_function_ctor_1),
+    cmocka_unit_test(test_mls_shape_function_ctor_2),
+    cmocka_unit_test(test_mls_shape_function_ctor_3),
+    cmocka_unit_test(test_mls_shape_function_ctor_4),
+    cmocka_unit_test(test_mls_shape_function_zero_consistency_0),
+    cmocka_unit_test(test_mls_shape_function_zero_consistency_1),
+    cmocka_unit_test(test_mls_shape_function_zero_consistency_2),
+    cmocka_unit_test(test_mls_shape_function_zero_consistency_3),
+    cmocka_unit_test(test_mls_shape_function_zero_consistency_4)
   };
-  return run_tests(tests);
+  return cmocka_run_group_tests(tests, NULL, NULL);
 }

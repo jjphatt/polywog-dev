@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <string.h>
-#include "cmockery.h"
+#include "cmocka.h"
 #include "core/partition_point_cloud.h"
 #include "geometry/create_point_lattice.h"
 #include "polywog/shepard_shape_function.h"
@@ -137,10 +137,10 @@ void test_shepard_shape_function_consistency(void** state)
 int main(int argc, char* argv[]) 
 {
   polymec_init(argc, argv);
-  const UnitTest tests[] = 
+  const struct CMUnitTest tests[] = 
   {
-    unit_test(test_shepard_shape_function_ctor),
-    unit_test(test_shepard_shape_function_consistency)
+    cmocka_unit_test(test_shepard_shape_function_ctor),
+    cmocka_unit_test(test_shepard_shape_function_consistency)
   };
-  return run_tests(tests);
+  return cmocka_run_group_tests(tests, NULL, NULL);
 }
