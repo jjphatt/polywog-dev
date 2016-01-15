@@ -11,13 +11,13 @@ struct sph_kernel_t
 {
   char* name;
   void* context;
-  void (*compute)(void* context, point_t* x, real_t* H, real_t* W, vector_t* grad_W);
+  void (*compute)(void* context, vector_t* x, sym_tensor2_t* H, real_t* W, vector_t* grad_W);
   void (*dtor)(void* context);
 };
 
 sph_kernel_t* sph_kernel_new(const char* name,
                              void* context,
-                             void (*compute)(void* context, point_t* x, real_t* H, real_t* W, vector_t* grad_W),
+                             void (*compute)(void* context, vector_t* x, sym_tensor2_t* H, real_t* W, vector_t* grad_W),
                              void (*dtor)(void* context))
 {
   sph_kernel_t* kernel = polymec_malloc(sizeof(sph_kernel_t));
@@ -36,8 +36,37 @@ void sph_kernel_free(sph_kernel_t* kernel)
   polymec_free(kernel);
 }
 
-void sph_kernel_compute(sph_kernel_t* kernel, point_t* x, real_t* H, real_t* W, vector_t* grad_W)
+void sph_kernel_compute(sph_kernel_t* kernel, vector_t* x, sym_tensor2_t* H, real_t* W, vector_t* grad_W)
 {
   kernel->compute(kernel->context, x, H, W, grad_W);
+}
+
+static void b_spline_compute(void* context, vector_t* x, sym_tensor2_t* H, real_t* W, vector_t* grad_W)
+{
+  vector_t eta;
+  sym_tensor2_dot_vector(H, x, &eta);
+  real_t eta_mag = vector_mag(&eta);
+  
+}
+
+sph_kernel_t* b_spline_sph_kernel_new()
+{
+  return sph_kernel_new("B-spline", NULL, b_spline_compute, NULL);
+}
+
+static void tabular_compute(void* context, vector_t* x, sym_tensor2_t* H, real_t* W, vector_t* grad_W)
+{
+}
+
+static void tabular_dtor(void* context)
+{
+}
+
+sph_kernel_t* tabular_sph_kernel_new(sph_kernel_t* kernel)
+{
+  int name_len = strlen(kernel->name);
+  char name[name_len + 16];
+  snprintf(name, name_len + 15, "table(%s)", kernel->name);
+  return sph_kernel_new(name, NULL, tabular_compute, tabular_dtor);
 }
 
