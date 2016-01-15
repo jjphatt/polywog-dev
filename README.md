@@ -1,3 +1,6 @@
+Copyright (c) 2012-2016, Jeffrey N. Johnson
+All rights reserved.
+ 
 Polywog (Polymec WithOut Grids) is an extension to the Polymec library that adds 
 features for easily creating applications that use mesh-free methods on point 
 clouds. See the INSTALL file for details on installation.
