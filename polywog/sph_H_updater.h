@@ -8,7 +8,7 @@
 #ifndef POLYWOG_SPH_H_UPDATER_H
 #define POLYWOG_SPH_H_UPDATER_H
 
-#include "core/point.h"
+#include "polywog/sph_kernel.h"
 
 // The SPH dynamics "H updater" is an object that computes the computes of 
 // the smoothing tensor field H by examining the neighborhoods surrounding 
@@ -20,16 +20,25 @@ typedef struct sph_H_updater_t sph_H_updater_t;
 // Creates an SPH H updater object that uses the given number of neighbors 
 // per smoothing length (n_per_h). This update should be performed at the 
 // initialization of an SPH simulation and at the end of each time step.
-sph_H_updater_t* sph_H_updater_new(real_t n_per_h);
+// If the anisotropic flag is set to true, the components of the anisotropic 
+// H tensor (used in ASPH) are computed; otherwise the components of the 
+// scalar smoothing scale h are computed and placed into a diagonal H tensor.
+sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
+                                   real_t n_per_h, 
+                                   bool anisotropic);
 
 // Destroys the given SPH H updater object.
 void sph_H_updater_free(sph_H_updater_t* updater);
 
 // Computes the new value of H at the point x given the neighbors {y}. The 
 // old value of H may be placed in H to improve the performance of the update.
-void sph_H_updater_update(sph_H_updater* updater, 
+// The number of iterations and the maximum fractional change in H are 
+// returned as diagnostics.
+void sph_H_updater_update(sph_H_updater_t* updater, 
                           point_t* x, point_t* ys, int num_neighbors,
-                          sym_tensor2_t* H);
+                          sym_tensor2_t* H,
+                          int* num_iterations,
+                          real_t* max_fractional_change);
 
 // Sets the maximum number of iterations used to find the new value of H.
 void sph_H_updater_set_max_iterations(sph_H_updater_t* updater, 
