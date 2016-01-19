@@ -32,24 +32,13 @@ sph_H_updater_t* anisotropic_sph_H_updater_new(sph_kernel_t* W,
 // Destroys the given SPH H updater object.
 void sph_H_updater_free(sph_H_updater_t* updater);
 
-// Computes the new value of H at the point x given the neighbors {y}. The 
-// old value of H may be placed in H to improve the performance of the update.
-// The number of iterations and the maximum fractional change in H are 
-// returned as diagnostics. This function returns true if the update succeeded 
-// and false otherwise.
-bool sph_H_updater_update(sph_H_updater_t* updater, 
-                          point_t* x, point_t* ys, int num_neighbors,
-                          sym_tensor2_t* H,
-                          int* num_iterations,
-                          real_t* max_fractional_change);
-
-// Sets the maximum number of iterations used to find the new value of H.
-void sph_H_updater_set_max_iterations(sph_H_updater_t* updater, 
-                                      int max_iters);
-
-// Sets the threshold for the fractional change in H that determines when an 
-// update is completed.
-void sph_H_updater_set_convergence_threshold(sph_H_updater_t* updater, 
-                                             real_t fractional_change);
+// Updates the value of H at a point, given the normalized zeroth moment
+// and the (tensor-valued) 2nd moment at that point, and placing the updated 
+// value in new_H.
+void sph_H_updater_update(sph_H_updater_t* updater, 
+                          sym_tensor2_t* H, 
+                          real_t zeroth_moment, 
+                          sym_tensor2_t* second_moment,
+                          sym_tensor2_t* new_H);
 
 #endif

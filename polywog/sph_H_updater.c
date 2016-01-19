@@ -66,43 +66,38 @@ void sph_H_updater_free(sph_H_updater_t* updater)
   polymec_free(updater);
 }
 
-static bool sph_H_updater_iterate(sph_H_updater_t* updater,
-                                  point_t* x, point_t* ys, int num_neighbors,
-                                  sym_tensor2_t* H, real_t* max_fractional_change)
+void sph_H_updater_update(sph_H_updater_t* updater, 
+                          sym_tensor2_t* H, 
+                          real_t zeroth_moment, 
+                          sym_tensor2_t* second_moment,
+                          sym_tensor2_t* new_H)
 {
-  // Compute the normalized kernel sum at the point x.
-  sym_tensor2_t Hi = {.xx = 1.0, .xy = 0.0, .xz = 0.0,
-                                 .yy = 1.0, .yz = 0.0,
-                                            .zz = 1.0};
-  real_t sum;
-
-  // Self contribution.
-  vector_t zero = {0.0, 0.0, 0.0}, grad;
-  sph_kernel_compute(updater->W, &zero, &Hi, &sum, &grad);
-
-  // Neighbor contributions.
-  for (int j = 0; j < num_neighbors; ++j)
+  // If the zeroth moment is "zeroish", we recommend doubling the number of 
+  // neighbors per h.
+  real_t s = 1.0;
+  if (zeroth_moment < 1e-5)
   {
-    real_t Wij;
-    vector_t rij;
-    point_displacement(x, &ys[j], &rij);
-    sph_kernel_compute(updater->W, &rij, &Hi, &Wij, &grad);
-    sum += Wij;
+    s = 2.0;
   }
+  else
+  {
+    // Look up the n_per_h value corresponding to the zeroth moment and compare 
+    // it to our target.
 
-  // Look up the n_per_h value corresponding to this sum and compare it 
-  // to our target.
-
-  // Have we fallen off the table?
-  real_t min_nh, max_nh;
-  lookup1_get_bounds(updater->table, &min_nh, &max_nh);
-  if (sum > max_nh)
-    return false;
-
-  // Look up the value and compute our ratio of target to actual nh.
-  real_t nh = lookup1_value(updater->table, sum);
-  real_t target_nh = updater->n_per_h;
-  real_t s = target_nh / nh;
+    // Have we fallen off the table?
+    real_t min_nh, max_nh;
+    lookup1_get_bounds(updater->table, &min_nh, &max_nh);
+    if (zeroth_moment > max_nh)
+      s = 0.5; // cut in half!
+    else
+    {
+      // Look up the value and compute our ratio of target to actual nh.
+      // We allow values of this ratio between between 1/4 and 4.
+      real_t nh = lookup1_value(updater->table, zeroth_moment);
+      real_t target_nh = updater->n_per_h;
+      s = MIN(4.0, MAX(0.25, target_nh / nh));
+    }
+  }
 
   // Compute the new determinant for H, following Thakar et al (2000). 
   real_t a = (s <= 1.0) ? 0.4 * (1.0 + s*s) 
@@ -110,64 +105,40 @@ static bool sph_H_updater_iterate(sph_H_updater_t* updater,
   real_t det_H = sym_tensor2_det(H);
   real_t new_det_H = det_H / pow(1.0 - a + a*s, 3.0);
   
-  sym_tensor2_set_identity(H, 1.0);
+  sym_tensor2_set_identity(new_H, 1.0);
   if (updater->anisotropic)
   {
     // We compute the "direction" of the tensor if we care about anisotropy.
 
-    // First, compute the second moment.
-    sym_tensor2_t X2;
-    // FIXME
-
-    // Find its minimum eigenvalue.
+    // Find the minimum eigenvalue of the second moment.
     real_t lambdas[3];
-    sym_tensor2_get_eigenvalues(X2, lambdas);
+    sym_tensor2_get_eigenvalues(second_moment, lambdas);
     real_t lambda_min = MIN(lambdas[0], MIN(lambdas[1], lambdas[2]));
 
-    // Compute a weighting that articulates a degree of confidence in 
-    // the second moment calculation.
+    // Compute a weighting that articulates the importance of the second
+    // moment as a function of s.
     real_t weight = MAX(0.0, MIN(1.0, 2.0/s - 1.0));
     if ((weight > 0.0) && 
-        (sym_tensor2_det(X2) > 0.0) && 
+        (sym_tensor2_det(second_moment) > 0.0) && 
         (lambda_min > 0.0))
     {
       // Compute the normalized "psi" tensor.
+      real_t max_second_moment_elem = 
+        MAX(second_moment->xx, 
+            MAX(second_moment->xy, 
+                MAX(second_moment->xz, 
+                    MAX(second_moment->yy, 
+                        MAX(second_moment->yz, second_moment->zz)))));
+      sym_tensor2_t psi;
+      sym_tensor2_copy(second_moment, &psi);
+      sym_tensor2_scale(&psi, 1.0/max_second_moment_elem);
+      if (sym_tensor2_det(&psi) < 1e-10)
+        sym_tensor2_set_identity(&psi, 1.0);
 
       // The new shape of H is just the inverse of the psi tensor.
-      sym_tensor2_invert(psi, H);
+      sym_tensor2_invert(&psi, new_H);
     }
   }
-  sym_tensor2_scale(H, (real_t)pow(new_det_H, 1.0/3.0));
-
-  return true;
-}
-
-bool sph_H_updater_update(sph_H_updater_t* updater, 
-                          point_t* x, point_t* ys, int num_neighbors,
-                          sym_tensor2_t* H,
-                          int* num_iterations,
-                          real_t* max_fractional_change)
-{
-  bool failed = false;
-  int num_iters = 0;
-  while (!failed && *max_fractional_change > updater->frac_change)
-  {
-    if (!sph_H_updater_iterate(updater, x, ys, num_neighbors, H, max_fractional_change))
-      failed = true;
-    ++num_iters;
-  }
-  *num_iterations = num_iters;
-  return !failed;
-}
-
-void sph_H_updater_set_max_iterations(sph_H_updater_t* updater, 
-                                      int max_iters)
-{
-}
-
-void sph_H_updater_set_convergence_threshold(sph_H_updater_t* updater, 
-                                             real_t fractional_change)
-{
-
+  sym_tensor2_scale(new_H, (real_t)pow(new_det_H, 1.0/3.0));
 }
 
