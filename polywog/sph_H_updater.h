@@ -20,12 +20,14 @@ typedef struct sph_H_updater_t sph_H_updater_t;
 // Creates an SPH H updater object that uses the given number of neighbors 
 // per smoothing length (n_per_h). This update should be performed at the 
 // initialization of an SPH simulation and at the end of each time step.
-// If the anisotropic flag is set to true, the components of the anisotropic 
-// H tensor (used in ASPH) are computed; otherwise the components of the 
-// scalar smoothing scale h are computed and placed into a diagonal H tensor.
-sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
-                                   real_t n_per_h, 
-                                   bool anisotropic);
+// The scalar smoothing scale h is computed and placed in a diagonal H tensor.
+sph_H_updater_t* isotropic_sph_H_updater_new(sph_kernel_t* W,
+                                             real_t n_per_h);
+
+// This version of the H updater computes the components of the anisotropic 
+// H tensor used in ASPH. 
+sph_H_updater_t* anisotropic_sph_H_updater_new(sph_kernel_t* W,
+                                               real_t n_per_h);
 
 // Destroys the given SPH H updater object.
 void sph_H_updater_free(sph_H_updater_t* updater);
@@ -33,8 +35,9 @@ void sph_H_updater_free(sph_H_updater_t* updater);
 // Computes the new value of H at the point x given the neighbors {y}. The 
 // old value of H may be placed in H to improve the performance of the update.
 // The number of iterations and the maximum fractional change in H are 
-// returned as diagnostics.
-void sph_H_updater_update(sph_H_updater_t* updater, 
+// returned as diagnostics. This function returns true if the update succeeded 
+// and false otherwise.
+bool sph_H_updater_update(sph_H_updater_t* updater, 
                           point_t* x, point_t* ys, int num_neighbors,
                           sym_tensor2_t* H,
                           int* num_iterations,

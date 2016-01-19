@@ -7,13 +7,17 @@ set (BUILD_SHARED_LIBS OFF)
 # Project and version numbers.
 project (polywog)
 set (POLYWOG_MAJOR_VERSION 0)
-set (POLYWOG_MINOR_VERSION 6)
+set (POLYWOG_MINOR_VERSION 7)
 set (POLYWOG_PATCH_VERSION 0)
 set (POLYWOG_VERSION "${POLYWOG_MAJOR_VERSION}.${POLYWOG_MINOR_VERSION}.${POLYWOG_PATCH_VERSION}")
 message("-- Building polywog (v${POLYWOG_VERSION})")
 
 # Use our own CMake stuff.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+# Look for headers first tin the top directory.
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 # Look for Polymec and use its CMake settings.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${POLYMEC_PREFIX}/share/polymec/")
@@ -26,10 +30,6 @@ message("-- Found polymec library in ${POLYMEC_PREFIX} (v${POLYMEC_VERSION})")
 # Generate polywog_version.h with the right version numbers.
 add_custom_target(update_version_h ALL
                   python "${POLYMEC_PREFIX}/share/polymec/update_version_h.py" polywog ${POLYWOG_VERSION} ${PROJECT_BINARY_DIR}/polywog/polywog_version.h)
-
-# Look for headers in the top directory.
-include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_BINARY_DIR})
 
 # Look for libraries in these directories.
 link_directories("${POLYMEC_PREFIX}/lib")

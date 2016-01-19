@@ -9,6 +9,7 @@
 #define POLYWOG_SPH_KERNEL_H
 
 #include "core/point.h"
+#include "core/tensor2.h"
 #include "core/lookup1.h"
 
 // An SPH kernel is a weighting function that determines the strength of 

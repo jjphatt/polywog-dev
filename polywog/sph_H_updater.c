@@ -13,15 +13,15 @@ struct sph_H_updater_t
   real_t n_per_h;
   int max_iters;
   real_t frac_change;
-  bool anisotopic;
+  bool anisotropic;
 
   // Lookup table mapping kernel sums to n_per_h values.
   lookup1_t* table;
 };
 
-sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
-                                   real_t n_per_h, 
-                                   bool anisotopic)
+static sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
+                                          real_t n_per_h,
+                                          bool anisotropic)
 {
   ASSERT(n_per_h > 0.0);
 
@@ -30,7 +30,7 @@ sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
   updater->n_per_h = n_per_h;
   updater->max_iters = 100;
   updater->frac_change = 0.05;
-  updater->anisotopic = anisotopic;
+  updater->anisotropic = anisotropic;
 
   // Generate a lookup table.
   int table_size = 500;
@@ -47,6 +47,18 @@ sph_H_updater_t* sph_H_updater_new(sph_kernel_t* W,
   return updater;
 }
 
+sph_H_updater_t* isotropic_sph_H_updater_new(sph_kernel_t* W,
+                                             real_t n_per_h)
+{
+  return sph_H_updater_new(W, n_per_h, false);
+}
+
+sph_H_updater_t* anisotropic_sph_H_updater_new(sph_kernel_t* W,
+                                               real_t n_per_h)
+{
+  return sph_H_updater_new(W, n_per_h, true);
+}
+
 void sph_H_updater_free(sph_H_updater_t* updater)
 {
   updater->W = NULL;
@@ -54,7 +66,7 @@ void sph_H_updater_free(sph_H_updater_t* updater)
   polymec_free(updater);
 }
 
-static void sph_H_updater_iterate(sph_H_updater_t* updater,
+static bool sph_H_updater_iterate(sph_H_updater_t* updater,
                                   point_t* x, point_t* ys, int num_neighbors,
                                   sym_tensor2_t* H, real_t* max_fractional_change)
 {
@@ -80,42 +92,72 @@ static void sph_H_updater_iterate(sph_H_updater_t* updater,
 
   // Look up the n_per_h value corresponding to this sum and compare it 
   // to our target.
+
+  // Have we fallen off the table?
+  real_t min_nh, max_nh;
+  lookup1_get_bounds(updater->table, &min_nh, &max_nh);
+  if (sum > max_nh)
+    return false;
+
+  // Look up the value and compute our ratio of target to actual nh.
   real_t nh = lookup1_value(updater->table, sum);
   real_t target_nh = updater->n_per_h;
   real_t s = target_nh / nh;
 
-  // Now use Thakar's iterate to determine the new h given the old.
   // Compute the new determinant for H, following Thakar et al (2000). 
   real_t a = (s <= 1.0) ? 0.4 * (1.0 + s*s) 
                         : 0.4 * (1.0 + 1.0/(s*s*s));
   real_t det_H = sym_tensor2_det(H);
   real_t new_det_H = det_H / pow(1.0 - a + a*s, 3.0);
   
-  // Compute the "direction" of the tensor if we care about anisotropy.
-  if (updater->anisotopic)
+  sym_tensor2_set_identity(H, 1.0);
+  if (updater->anisotropic)
   {
-  }
+    // We compute the "direction" of the tensor if we care about anisotropy.
 
-  // Otherwise just set up the isotropic tensor.
-  else
-  {
-    H->xx = H->yy = H->zz = (real_t)pow(new_det_H, 1.0/3.0);
-    H->xy = H->xz = H->yz = 0.0;
+    // First, compute the second moment.
+    sym_tensor2_t X2;
+    // FIXME
+
+    // Find its minimum eigenvalue.
+    real_t lambdas[3];
+    sym_tensor2_get_eigenvalues(X2, lambdas);
+    real_t lambda_min = MIN(lambdas[0], MIN(lambdas[1], lambdas[2]));
+
+    // Compute a weighting that articulates a degree of confidence in 
+    // the second moment calculation.
+    real_t weight = MAX(0.0, MIN(1.0, 2.0/s - 1.0));
+    if ((weight > 0.0) && 
+        (sym_tensor2_det(X2) > 0.0) && 
+        (lambda_min > 0.0))
+    {
+      // Compute the normalized "psi" tensor.
+
+      // The new shape of H is just the inverse of the psi tensor.
+      sym_tensor2_invert(psi, H);
+    }
   }
+  sym_tensor2_scale(H, (real_t)pow(new_det_H, 1.0/3.0));
+
+  return true;
 }
 
-void sph_H_updater_update(sph_H_updater_t* updater, 
+bool sph_H_updater_update(sph_H_updater_t* updater, 
                           point_t* x, point_t* ys, int num_neighbors,
                           sym_tensor2_t* H,
                           int* num_iterations,
                           real_t* max_fractional_change)
 {
+  bool failed = false;
   int num_iters = 0;
-  do
+  while (!failed && *max_fractional_change > updater->frac_change)
   {
-    sph_H_updater_iterate(updater, x, ys, num_neighbors, H, max_fractional_change);
+    if (!sph_H_updater_iterate(updater, x, ys, num_neighbors, H, max_fractional_change))
+      failed = true;
     ++num_iters;
-  } while (*max_fractional_change > updater->frac_change);
+  }
+  *num_iterations = num_iters;
+  return !failed;
 }
 
 void sph_H_updater_set_max_iterations(sph_H_updater_t* updater, 
