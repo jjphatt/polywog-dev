@@ -16,7 +16,8 @@ struct sph_dynamics_t
                   real_t* Ui, real_t* Uj, 
                   real_t Wi, real_t Wj,
                   vector_t* grad_Wi, vector_t* grad_Wj,
-                  real_t* dUidt, real_t* dUjdt);
+                  real_t* dUidt, real_t* dUjdt,
+                  sph_node_data_t* node_data);
   void (*dtor)(void* context);
 };
 
@@ -27,7 +28,8 @@ sph_dynamics_t* sph_dynamics_new(const char* name,
                                                  real_t* Ui, real_t* Uj, 
                                                  real_t Wi, real_t Wj,
                                                  vector_t* grad_Wi, vector_t* grad_Wj,
-                                                 real_t* dUidt, real_t* dUjdt),
+                                                 real_t* dUidt, real_t* dUjdt,
+                                                 sph_node_data_t* node_data),
                                  void (*dtor)(void* context))
 {
   ASSERT(compute != NULL);
@@ -52,8 +54,9 @@ void sph_dynamics_compute(sph_dynamics_t* dyn, real_t t,
                           real_t* Ui, real_t* Uj,
                           real_t Wi, real_t Wj,
                           vector_t* grad_Wi, vector_t* grad_Wj,
-                          real_t* dUidt, real_t* dUjdt)
+                          real_t* dUidt, real_t* dUjdt,
+                          sph_node_data_t* node_data)
 {
-  dyn->compute(dyn->context, t, i, j, Ui, Uj, Wi, Wj, grad_Wi, grad_Wj, dUidt, dUjdt);
+  dyn->compute(dyn->context, t, i, j, Ui, Uj, Wi, Wj, grad_Wi, grad_Wj, dUidt, dUjdt, node_data);
 }
 
