@@ -8,7 +8,7 @@
 #ifndef POLYWOG_INTERPRETER_REGISTER_MODEL_FUNCTIONS_H
 #define POLYWOG_INTERPRETER_REGISTER_MODEL_FUNCTIONS_H
 
-#include "core/interpreter.h"
+#include "model/interpreter.h"
 
 // This function registers meshless-related helper functions for the
 // interpreter.
