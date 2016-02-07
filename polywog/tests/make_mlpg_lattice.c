@@ -91,7 +91,7 @@ void make_mlpg_lattice(bbox_t* bbox, int nx, int ny, int nz, real_t R_over_dx,
   point_t x0 = {.x = 0.5, .y = 0.5, .z = 0.5/nx};
   sp_func_vtable n_vtable = {.eval = n_eval};
   sp_func_t* n = sp_func_new("mlpg lattice normal", bbox, n_vtable,
-                             SP_FUNC_INHOMOGENEOUS, 3);
+                             SP_FUNC_HETEROGENEOUS, 3);
   point_cloud_set_property(*domain, "normal", n, NULL);
 
   // Set up a "radius" field to measure point extents.
