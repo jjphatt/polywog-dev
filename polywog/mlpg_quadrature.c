@@ -47,7 +47,7 @@ static void cube_surf_get_quad(void* context, int i, point_t* points, real_t* we
 {
   mlpg_simple_t* mlpg = context;
   real_t gauss_pts[mlpg->N], gauss_wts[mlpg->N];
-  get_gauss_legendre_points(mlpg->N, gauss_wts, gauss_wts);
+  get_gauss_legendre_points(mlpg->N, gauss_pts, gauss_wts);
   point_t* xi = &mlpg->cloud->points[i];
   real_t hi = mlpg->extents[i];
   real_t L = mlpg->ratio * hi;
@@ -147,7 +147,7 @@ static void cube_vol_get_quad(void* context, int i, point_t* points, real_t* wei
 {
   mlpg_simple_t* mlpg = context;
   real_t gauss_pts[mlpg->N], gauss_wts[mlpg->N];
-  get_gauss_legendre_points(mlpg->N, gauss_wts, gauss_wts);
+  get_gauss_legendre_points(mlpg->N, gauss_pts, gauss_wts);
   point_t* xi = &mlpg->cloud->points[i];
   real_t hi = mlpg->extents[i];
   real_t L = mlpg->ratio * hi;
