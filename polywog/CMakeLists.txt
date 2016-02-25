@@ -8,6 +8,7 @@ add_polymec_library(polywog polywog.c
                     fvpm_interparticle_area.c sph_kernel.c sph_dynamics.c 
                     sph_H_updater.c
                     interpreter_register_meshless_functions.c)
+add_dependencies(polywog update_version_h) # <-- needed on Mac(?!)
 
 set(POLYWOG_LIBRARIES polywog;${POLYMEC_LIBRARIES} PARENT_SCOPE)
 set(POLYWOG_LIBRARIES polywog;${POLYMEC_LIBRARIES})
