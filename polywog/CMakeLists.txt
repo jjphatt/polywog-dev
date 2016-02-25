@@ -8,9 +8,6 @@ add_polymec_library(polywog polywog.c
                     fvpm_interparticle_area.c sph_kernel.c sph_dynamics.c 
                     sph_H_updater.c
                     interpreter_register_meshless_functions.c)
-if (BUILD_SHARED_LIBS)
-  target_link_libraries(polywog ${POLYMEC_LIBRARIES})
-endif()
 
 set(POLYWOG_LIBRARIES polywog;${POLYMEC_LIBRARIES} PARENT_SCOPE)
 set(POLYWOG_LIBRARIES polywog;${POLYMEC_LIBRARIES})
