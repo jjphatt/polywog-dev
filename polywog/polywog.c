@@ -11,13 +11,11 @@
 #include "core/polymec_version.h"
 #include "polywog/polywog.h"
 
+#if POLYWOG_MAJOR_VERSION > 0
+
 #if POLYMEC_MAJOR_VERSION != POLYWOG_MAJOR_VERSION
 #error "The installed major version of polymec differs from that of polywog. Please make sure these versions match."
 #endif
-#if POLYMEC_MINOR_VERSION != POLYWOG_MINOR_VERSION
-#error "The installed minor version of polymec differs from that of polywog. Please make sure these versions match."
-#endif
-#if POLYMEC_PATCH_VERSION != POLYWOG_PATCH_VERSION
-#error "The installed patch version of polymec differs from that of polywog. Please make sure these versions match."
+
 #endif
 
