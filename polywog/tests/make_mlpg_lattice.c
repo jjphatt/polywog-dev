@@ -84,8 +84,8 @@ void make_mlpg_lattice(bbox_t* bbox, int nx, int ny, int nz, real_t R_over_dx,
   tagger_unite_tag((*domain)->tags, "boundary", "+z");
 
   // Do partitioning.
-  exchanger_t* ex = partition_point_cloud(domain, MPI_COMM_WORLD, NULL, 1.05);
-  exchanger_free(ex);
+  migrator_t* m = partition_point_cloud(domain, MPI_COMM_WORLD, NULL, 1.05);
+  migrator_free(m);
 
   // Set up a normal vector field for the boundary of the domain.
   point_t x0 = {.x = 0.5, .y = 0.5, .z = 0.5/nx};

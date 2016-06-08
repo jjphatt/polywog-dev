@@ -22,8 +22,8 @@ static void make_lattice(int nx, int ny, int nz, real_t h_over_dx,
 {
   bbox_t bbox = {.x1 = 0.0, .x2 = 1.0, .y1 = 0.0, .y2 = 1.0, .z1 = 0.0, .z2 = 1.0};
   *domain = create_uniform_point_lattice(MPI_COMM_SELF, nx, ny, nz, &bbox);
-  exchanger_t* ex = partition_point_cloud(domain, MPI_COMM_WORLD, NULL, 1.05);
-  exchanger_free(ex);
+  migrator_t* m = partition_point_cloud(domain, MPI_COMM_WORLD, NULL, 1.05);
+  migrator_free(m);
   int num_local_points = (*domain)->num_points;
   real_t dx = 1.0 / nx;
 
