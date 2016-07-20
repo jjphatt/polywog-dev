@@ -66,6 +66,20 @@ multicloud_iteration_t* multicloud_iteration_new(const char* name,
                                                  void* context,
                                                  multicloud_iteration_vtable vtable);
 
+// Computes the residual vector R corresponding to the solution X on the 
+// given point cloud at time t for the multicloud iteration scheme.
+void multicloud_iteration_compute_residual(multicloud_iteration_t* iter,
+                                           point_cloud_t* cloud, 
+                                           real_t t, 
+                                           real_t* X, 
+                                           real_t* R);
+
+// Updates the solution vector X on the given point cloud at time t, in place.
+void multicloud_iteration_update(multicloud_iteration_t* iter,
+                                 point_cloud_t* cloud, 
+                                 real_t t, 
+                                 real_t* X);
+
 // Creates a new coarsened point cloud hierarchy whose finest level is the 
 // given point cloud. The hierarchy assumes control of all point clouds that 
 // it contains EXCEPT this finest cloud.

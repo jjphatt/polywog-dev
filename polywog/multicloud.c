@@ -68,12 +68,31 @@ multicloud_iteration_t* multicloud_iteration_new(const char* name,
                                                  void* context,
                                                  multicloud_iteration_vtable vtable)
 {
+  ASSERT(vtable.residual != NULL);
+  ASSERT(vtable.update != NULL);
   multicloud_iteration_t* iter = GC_MALLOC(sizeof(multicloud_iteration_t));
   iter->name = string_dup(name);
   iter->context = context;
   iter->vtable = vtable;
   GC_register_finalizer(iter, multicloud_iteration_free, iter, NULL, NULL);
   return iter;
+}
+
+void multicloud_iteration_compute_residual(multicloud_iteration_t* iter,
+                                           point_cloud_t* cloud, 
+                                           real_t t, 
+                                           real_t* X, 
+                                           real_t* R)
+{
+  iter->vtable.residual(iter->context, cloud, t, X, R);
+}
+
+void multicloud_iteration_update(multicloud_iteration_t* iter,
+                                 point_cloud_t* cloud, 
+                                 real_t t, 
+                                 real_t* X)
+{
+  iter->vtable.update(iter->context, cloud, t, X);
 }
 
 multicloud_hierarchy_t* multicloud_hierarchy_new(point_cloud_t* cloud)
